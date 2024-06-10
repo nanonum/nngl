@@ -1,0 +1,829 @@
+@charset "UTF-8";
+$BREAKPOINT: 860px;
+
+// local function ------------------------------------------------------------------------
+
+@mixin mq($from, $to) {
+  @if $from and $to {
+    @media (min-width: #{$from}) and (max-width: #{$to}) {
+      @content;
+    }
+    // @debug 'if';
+  } @else if $from == null and $to {
+
+    @media (max-width: #{$to}) {
+      @content;
+      // @debug 'else if';
+    }
+  } @else if $from and $to == null {
+    @media (min-width: #{$from}) {
+      @content;
+      // @debug 'else if';
+    }
+  } @else {
+    @content;
+    // @debug 'else';
+  }
+}
+
+$scale_type: false;
+@mixin pc {
+  @include mq($BREAKPOINT + 1, 1536px) {
+    $scale_type: auto !global;
+    @content;
+  }
+  @include mq(1537px, null) {
+    $scale_type: px !global;
+    @content;
+  }
+}
+@mixin sp(){
+  @media (max-width: #{$BREAKPOINT}){
+    $scale_type: sp !global;
+    @content;
+  }
+}
+@mixin both() {
+  @include pc {
+    @content;
+  }
+  @include sp {
+    @content;
+  }
+
+}
+
+@function px($px) {
+  @if $scale_type == auto {
+    @return $px * 0.06510417vw;
+    // @return math.div($px, 1536) * 100vw;
+  } @else if $scale_type == sp {
+    @return vw($px);
+  } @else {
+    @return $px * 1px;
+  }
+}
+// @function px_max($px) {
+//   @if $is_scaling == true {
+//     @return max(math.div($px, 1536) * 100vw, 12px);
+//   } @else {
+//     @return $px * 1px;
+//   }
+// }
+
+
+// local function
+@mixin bg--odd {
+  @include pc {
+    // @include resolution2x {
+    //   background-image: imgurl("background__ice--odd@2x.jpg.webp");
+    // }
+    // @include resolution1x {
+    //   background-image: imgurl("background__ice--odd.jpg.webp");
+    // }
+    background-image: imgurl("background__ice--odd.jpg.webp");
+  }
+  @include sp {
+    background-image: imgurl("background__ice--odd_sp.jpg.webp");
+  }
+}
+@mixin bg--even {
+  @include pc {
+    // @include resolution2x {
+    //   background-image: imgurl("background__ice--even@2x.jpg.webp");
+    // }
+    // @include resolution1x {
+    //   background-image: imgurl("background__ice--even.jpg.webp");
+    // }
+    background-image: imgurl("background__ice--even.jpg.webp");
+  }
+  @include sp {
+    background-image: imgurl("background__ice--even_sp.jpg.webp");
+  }
+}
+@function imgurl($src) {
+  @return url("#{$images}#{$src}");
+}
+
+@function vw1920($vw) {
+  @return math.div($vw, 1920) * 100vw;
+}
+
+@function vw1440($vw) {
+  @return math.div($vw, 1440) * 100vw;
+}
+
+@function vw1600($vw) {
+  @return math.div($vw, 1600) * 100vw;
+}
+
+@mixin hover_color($color: $blue) {
+  transition: color .4s $curve_main;
+  &:hover {
+    color: $color
+  }
+}
+
+////
+/// CSS cubic-bezier timing functions.
+///
+/// @link https://goo.gl/p8u6SK
+///
+/// @type string
+////
+
+$ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+$ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+$ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+$ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+$ease-in-sine: cubic-bezier(0.47, 0, 0.745, 0.715);
+$ease-in-expo: cubic-bezier(0.95, 0.05, 0.795, 0.035);
+$ease-in-circ: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+$ease-in-back: cubic-bezier(0.6, -0.28, 0.735, 0.045);
+
+$ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+$ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+$ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+$ease-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
+$ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+$ease-out-circ: cubic-bezier(0.075, 0.82, 0.165, 1);
+$ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+$ease-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+$ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+$ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+$ease-in-out-quint: cubic-bezier(0.86, 0, 0.07, 1);
+$ease-in-out-sine: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+$ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
+$ease-in-out-circ: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+$ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+
+// media query ---------------------------
+@mixin ie11 {
+  @media all and (-ms-high-contrast: none) {
+    @content;
+  }
+}
+@mixin resolution2x() {
+  @media (-webkit-min-device-pixel-ratio: 2){
+    @content;
+  }
+}
+@mixin resolution1x() {
+  @media (-webkit-max-device-pixel-ratio: 1){
+    @content;
+  }
+}
+@mixin safari {
+  _::-webkit-full-page-media, _:future, :root & {
+    @content;
+  }
+}
+@mixin safari100vh {
+  height: 100vh;
+  @supports (-webkit-touch-callout: none) {
+    height: -webkit-fill-available;
+  }
+}
+// local ----------------------------------------
+
+@mixin shadow($alpha: 0.1) {
+  @include pc {
+    filter: drop-shadow(0px 0px 24px rgba(0, 0, 0, $alpha));
+  }
+  @include sp {
+    filter: drop-shadow(0px 0px vw(24) rgba(0, 0, 0, $alpha));
+  }
+}
+@mixin box_shadow($alpha: 0.1) {
+  @include pc {
+    box-shadow: 0px 0px 24px rgba(0, 0, 0, $alpha);
+  }
+  @include sp {
+    box-shadow: 0px 0px vw(24) rgba(0, 0, 0, $alpha);
+  }
+}
+
+@mixin figl($l) {
+  margin-left: (((1920 * 0.5 ) - 320 - 3) - $l) * -1px;
+}
+@mixin figr($r) {
+  margin-right: ($r - 640 - 320 + 3) * -1px;
+}
+
+
+@mixin hover_merge($transition: auto) {
+  $common_transition: opacity .8s #{$ease-out-expo};
+  transition: list.append(unquote($transition), $common_transition, $separator: comma);
+  // &:hover {
+  //   opacity: 0.5;
+  // }
+}
+
+
+
+@mixin hover_dropshadow($add: auto) {
+  filter: drop-shadow( (0px * $scale) (100px * $scale) (80px * $scale) rgba(0, 0, 0, 0.07)) drop-shadow( (0px * $scale) (22.6775px * $scale) (32.0139px * $scale) rgba(0, 0, 0, 0.0368021)) drop-shadow( (0px * $scale) (14.5942px * $scale) (18.6751px * $scale) rgba(0, 0, 0, 0.0436922)) drop-shadow( (0px * $scale) (8.66213px * $scale) (9.37126px * $scale) rgba(0, 0, 0, 0.0385191));
+  // box-shadow: (0px * $scale) (36px * $scale) (80px * $scale) rgba(0, 0, 0, 0.3), (0px * $scale) (10.8529px * $scale) (26.0002px * $scale) rgba(0, 0, 0, 0.178125), (0px * $scale) (4.50776px * $scale) (8.92639px * $scale) rgba(0, 0, 0, 0.119293), (0px * $scale) (1.63037px * $scale) (1.85734px * $scale) rgba(0, 0, 0, 0.101597);
+  @include hover_merge('filter .8s #{$ease-out-expo}, ' + $add);
+  &:hover {
+    filter: none;
+  }
+}
+@mixin hover_shadow($add: auto) {
+  // filter: drop-shadow( (0px * $scale) (100px * $scale) (80px * $scale) rgba(0, 0, 0, 0.07)) drop-shadow( (0px * $scale) (22.6775px * $scale) (32.0139px * $scale) rgba(0, 0, 0, 0.0368021)) drop-shadow( (0px * $scale) (14.5942px * $scale) (18.6751px * $scale) rgba(0, 0, 0, 0.0436922)) drop-shadow( (0px * $scale) (8.66213px * $scale) (9.37126px * $scale) rgba(0, 0, 0, 0.0385191));
+
+  box-shadow: (0px * $scale) (36px * $scale) (80px * $scale) rgba(0, 0, 0, 0.3), (0px * $scale) (10.8529px * $scale) (26.0002px * $scale) rgba(0, 0, 0, 0.178125), (0px * $scale) (4.50776px * $scale) (8.92639px * $scale) rgba(0, 0, 0, 0.119293), (0px * $scale) (1.63037px * $scale) (1.85734px * $scale) rgba(0, 0, 0, 0.101597);
+  @include pc {
+    @include hover_merge('box-shadow .8s #{$ease-out-expo}, ' + $add);
+    &:hover {
+      box-shadow: none;
+    }
+  }
+}
+
+// responsive----------------------------------------
+@mixin pc_min {
+  @media (min-width: #{$BREAKPOINT + 1}) and (max-width: 1365px){
+    @content;
+    opacity: 1;
+  }
+}
+
+// @mixin pc(){
+//   @media (min-width: #{$BREAKPOINT + 1}){
+//     @content;
+//   }
+// }
+@mixin pc1440(){
+  @media (min-width: #{$BREAKPOINT + 1}) and (max-width: 1440px){
+    @content;
+  }
+}
+@mixin pc_maxwidth(){
+  @media (min-width: #{$MAX_WIDTH + 1}){
+    @content;
+  }
+}
+@function vw($vw) {
+  // @return $vw + 0px;
+  @return $vw * 0.26666667vw;
+  // @return math.div(1vw * $vw, $sp_viewport_width * 0.01);
+}
+
+
+@include pc {
+  .-sp {
+    display: none !important;
+    &--f {
+      display: none !important;
+    }
+  }
+}
+@include sp {
+  .-pc {
+    display: none !important;
+    &--f {
+      display: none !important;
+    }
+  }
+}
+@include pc{
+  .hidden-lg{
+    display: none;
+  }
+  .visible-xs{
+    display: none;
+  }
+  .visible-sp{
+    display: none;
+  }
+}
+@include sp{
+  .hidden-xs{
+    display: none;
+  }
+  .hidden-sp{
+    display: none;
+  }
+  .visible-lg{
+    display: none;
+  }
+}
+
+@mixin background-retina($full_filename) {
+  $dot_index: str-index($full_filename, '.');
+  $filename: str-slice($full_filename, 0, $dot_index - 1);
+  $ext: str-slice($full_filename, $dot_index, -1);
+  background-image: url($images + $full_filename);
+  @include resolution2x {
+    background-image: url($images + $filename + '@2x' + $ext);
+  }
+}
+
+// dev ----------------------------------------
+$is_production: false;
+@mixin dev($rgb: red, $opacity: .5) {
+  @if $env == 'development' {
+    background-color: rgba($rgb, $opacity);
+  }
+}
+@mixin is_production () {
+  @if $env == 'production' {
+    @content;
+  }
+}
+@mixin is_development () {
+  @if $env == 'development' {
+    @content;
+  }
+}
+
+// event ---------------------------------------
+@mixin hov {
+  @include pc {
+    &:hover {
+      @content;
+    }
+  }
+}
+@mixin hoverBG($color) {
+  transition: background-color .4s $ease-out-expo;
+  @include pc{
+    &:hover{
+      background-color: $color;
+    }
+  }
+}
+@mixin bg_Hover($color, $color_hover) {
+  transition: background-color .4s $ease-out-expo;
+  background-color: $color;
+  @include pc{
+    &:hover{
+      background-color: $color_hover;
+    }
+  }
+}
+
+
+
+// utility----------------------------------------
+
+@function remap($value, $in_min, $in_max, $out_min, $out_max) {
+  @return ($value - $in_min) * (($out_max - $out_min) / ($in_max - $in_min)) + $out_min;
+}
+@mixin content($w: null, $h: null) {
+  content: '';
+  display: block;
+
+  @if $w {
+    width: $w;
+  }
+  @if $h {
+    height: $h;
+  }
+}
+
+@mixin clearfix{
+  &:after{
+    content: '';
+    clear: both;
+    display: block;
+  }
+}
+@mixin nodrag {
+	user-drag: none;
+	-webkit-user-drag: none;
+	-moz-user-select: none;
+}
+// @function norm($z, $max) {
+//   $norm: 1 - (($z - 1) / ( $max - 1));
+//   @return math.pow($norm, $pow);
+// }
+// @function range($norm, $min, $max) {
+//   @return ( ($max - $min) * $norm) + ($max - $min);
+// }
+// typography----------------------------------------
+@mixin vpal {
+  font-feature-settings: "vpal";
+  @media all and (-ms-high-contrast: none) {
+    font-feature-settings: "vkna";
+  }
+}
+@mixin fwm {
+  font-weight: 500;
+}
+// @mixin waitWebFont () {
+//   html {
+//     // display: none;
+//     // visibility: hidden;
+//     &.wf-active {
+//       // display: block;
+//       // visibility: visible;
+//     }
+//   }
+// }
+
+// veryshorthand----------------------------------------
+@mixin mb($pc, $sp){
+  @include pc{
+    margin-bottom: $pc + 0px;
+  };
+  @include sp{
+    margin-bottom: vw(#{$sp});
+  };
+}
+@mixin fz($pc, $sp){
+  @include pc{
+    font-size: $pc + 'px'
+  };
+  @include sp{
+    @if $sp{
+      font-size: vw($sp);
+    } @else {
+      font-size: vw($pc*2);
+    }
+  };
+}
+
+@mixin fz($pc, $sp) {
+  @include pc{
+    font-size: 0px + $pc;
+  };
+  @include sp{
+    font-size: vw($sp);
+  };
+}
+@mixin mb($pc, $sp) {
+  @include pc{
+    margin-bottom: 0px + $pc;
+  };
+  @include sp{
+    margin-bottom: vw($sp);
+  };
+}
+@mixin mt($pc, $sp) {
+  @include pc{
+    margin-top: 0px + $pc;
+  };
+  @include sp{
+    margin-top: vw($sp);
+  };
+}
+@mixin ml($pc, $sp) {
+  @include pc{
+    margin-left: 0px + $pc;
+  };
+  @include sp{
+    margin-left: vw($sp);
+  };
+}
+@mixin mr($pc, $sp) {
+  @include pc{
+    margin-right: 0px + $pc;
+  };
+  @include sp{
+    margin-right: vw($sp);
+  };
+}
+@mixin m($pc, $sp) {
+  @include pc{
+    margin: 0px + $pc;
+  };
+  @include sp{
+    margin: vw($sp);
+  };
+}
+@mixin p($pc, $sp) {
+  @include pc{
+    padding: 0px + $pc;
+  };
+  @include sp{
+    padding: vw($sp);
+  };
+}
+@mixin pt($pc, $sp) {
+  @include pc{
+    padding-top: 0px + $pc;
+  };
+  @include sp{
+    padding-top: vw($sp);
+  };
+}
+@mixin pb($pc, $sp) {
+  @include pc{
+    padding-bottom: 0px + $pc;
+  };
+  @include sp{
+    padding-bottom: vw($sp);
+  };
+}
+@mixin pl($pc, $sp) {
+  @include pc{
+    padding-left: 0px + $pc;
+  };
+  @include sp{
+    padding-left: vw($sp);
+  };
+}
+@mixin pr($pc, $sp) {
+  @include pc{
+    padding-right: 0px + $pc;
+  };
+  @include sp{
+    padding-right: vw($sp);
+  };
+}
+
+@mixin mlr($pc, $sp) {
+  @include pc{
+    margin-right: 0px + $pc;
+    margin-left: 0px + $pc;
+  };
+  @include sp{
+    margin-right: vw($sp);
+    margin-left: vw($sp);
+  };
+}
+@mixin plr($pc, $sp) {
+  @include pc{
+    padding-right: 0px + $pc;
+    padding-left: 0px + $pc;
+  };
+  @include sp{
+    padding-right: vw($sp);
+    padding-left: vw($sp);
+  };
+}
+@mixin ptb($pc, $sp) {
+  @include pc{
+    padding-top: 0px + $pc;
+    padding-bottom: 0px + $pc;
+  };
+  @include sp{
+    padding-top: vw($sp);
+    padding-bottom: vw($sp);
+  };
+}
+@mixin bdt($px, $color) {
+  @include pc{
+    border-top: 0px + $px solid $color;
+  };
+  @include sp{
+    border-top: vw($px * 2) solid $color;
+  };
+}
+@mixin bdb($px, $color) {
+  @include pc{
+    border-bottom: 0px + $px solid $color;
+  };
+  @include sp{
+    border-bottom: vw($px * 2) solid $color;
+  };
+}
+@mixin bdl($px, $color) {
+  @include pc{
+    border-left: 0px + $px solid $color;
+  };
+  @include sp{
+    border-left: vw($px * 2) solid $color;
+  };
+}
+@mixin bdr($px, $color) {
+  @include pc{
+    border-right: 0px + $px solid $color;
+  };
+  @include sp{
+    border-right: vw($px * 2) solid $color;
+  };
+}
+@mixin bd($px, $color) {
+  @include pc{
+    border: 0px + $px solid $color;
+  };
+  @include sp{
+    border: vw($px * 2) solid $color;
+  };
+}
+@mixin h($pc, $sp) {
+  @include pc{
+    height: 0px + $pc;
+  };
+  @include sp{
+    height: vw($sp);
+  };
+}
+@mixin w($pc, $sp) {
+  @include pc{
+    width: 0px + $pc;
+  };
+  @include sp{
+    width: vw($sp);
+  };
+}
+@mixin mw($pc, $sp) {
+  @include pc{
+    min-width: 0px + $pc;
+  };
+  @include sp{
+    min-width: vw($sp);
+  };
+}
+@mixin Mw($pc, $sp) {
+  @include pc{
+    max-width: 0px + $pc;
+  };
+  @include sp{
+    max-width: vw($sp);
+  };
+}
+@mixin mh($pc, $sp) {
+  @include pc{
+    min-height: 0px + $pc;
+  };
+  @include sp{
+    min-height: vw($sp);
+  };
+}
+@mixin Mh($pc, $sp) {
+  @include pc{
+    max-height: 0px + $pc;
+  };
+  @include sp{
+    max-height: vw($sp);
+  };
+}
+@mixin t($pc, $sp) {
+  @include pc{
+    top: 0px + $pc;
+  };
+  @include sp{
+    top: vw($sp);
+  };
+}
+@mixin r($pc, $sp) {
+  @include pc{
+    right: 0px + $pc;
+  };
+  @include sp{
+    right: vw($sp);
+  };
+}
+@mixin b($pc, $sp) {
+  @include pc{
+    bottom: 0px + $pc;
+  };
+  @include sp{
+    bottom: vw($sp);
+  };
+}
+@mixin l($pc, $sp) {
+  @include pc{
+    left: 0px + $pc;
+  };
+  @include sp{
+    left: vw($sp);
+  };
+}
+@mixin lh($pc, $sp) {
+  @include pc{
+    line-height: $pc;
+  };
+  @include sp{
+    line-height: vw($sp);
+  };
+}
+
+// flexbox ----------------------------------------
+@mixin flex_c {
+  display: flex;
+  flex-direction: column;
+}
+@mixin flex_r {
+  display: flex;
+  flex-direction: row;
+}
+@mixin flex_rc {
+  display: flex;
+  @include pc {
+    flex-direction: row;
+  }
+  @include sp {
+    flex-direction: column;
+  }
+}
+@mixin flex_cr {
+  display: flex;
+  @include pc {
+    flex-direction: column;
+  }
+  @include sp {
+    flex-direction: row;
+  }
+}
+
+@mixin flexcenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// last margin ----------------------------------------
+@mixin lastmb {
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+@mixin lastmr {
+  &:last-of-type {
+    margin-right: 0;
+  }
+}
+@mixin firstml {
+  &:first-of-type {
+    margin-right: 0;
+  }
+}
+@mixin nthmr($nth) {
+  &:nth-of-type($nth) {
+    margin-right: 0;
+  }
+}
+@mixin lastrowmb($n) {
+  &:nth-last-of-type(-n + $n) {
+    margin-bottom: 0;
+  };
+}
+
+
+
+
+
+
+@mixin mq_xs {
+  @include mq($mq_xs...) {
+    @content;
+  }
+}
+@mixin mq_sm {
+  @include mq($mq_sm...) {
+    @content;
+  }
+}
+@mixin mq_md {
+  @include mq($mq_md...) {
+    @content;
+  }
+}
+@mixin mq_lg {
+  @include mq($mq_lg...) {
+    @content;
+  }
+}
+
+@mixin mq_pclg {
+  @include mq(1200px, null) {
+    @content;
+  }
+}
+
+@mixin tablet() {
+  @media (min-width: #{$BREAKPOINT}) and (max-width: 1024px) {
+    @content;
+  }
+}
+@mixin pc_min() {
+  @media (min-width: #{$BREAKPOINT}) and (max-width: 1320px) {
+    @content;
+  }
+}
+@mixin fz($pc, $sp: $pc) {
+  @include pc {
+    font-size: $pc + ( (0px));
+  }
+  @include sp {
+    font-size: vw($sp);
+  }
+}
+@mixin hover($opacity: 0.3) {
+  // @include pc {
+    transition: opacity $ease-out-expo .8s;
+    &:hover {
+      opacity: $opacity;
+    }
+  // }
+}
+@function pvw($px) {
+  @return math.div(0vw + $px, 1920) * 100;
+}
+@function px_lg($px) {
+  @return math.div(0vw + $px, 1920) * 100;
+}
+// @function px($px) {
+//   @return (0vw + $px/1366*100);
+// }
+
+
