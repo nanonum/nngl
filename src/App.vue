@@ -1,17 +1,31 @@
 <script setup>
-import { onMounted, reactive, ref, onBeforeUnmount, onUnmounted } from 'vue';
+import { nextTick, computed, watch, onMounted, reactive, ref, onBeforeUnmount, onUnmounted } from 'vue';
 import { Application, Sprite, Point, DisplacementFilter, Filter, GlProgram, Graphics } from 'pixi.js';
 import FilterHelper from './includes/FilterHelper.js'
-import Image from './components/Image.vue';
+import Shader from './components/Shader.vue';
+import Thumbnail from './components/Thumbnail.vue';
 import vertex from './default.vert';
+import anime from 'animejs/lib/anime.es.js'
 
 
+// Vue
+const isPixiActive = ref(false)
+const stage = ref('shader')
 
+const transition = reactive({
+  saturation: 1
+})
+const shaderTitle = ref('')
+const state = reactive({
+  stage: 'shader',
+  shader: null,
+  title: null,
+  path: null,
+})
 
 // PIXI
-const isPixiActive = ref(false)
-let modules = ref();
-modules.value = import.meta.glob('/src/shaders/**/*.frag', { eager: true })
+let shaders = ref();
+shaders.value = import.meta.glob('/src/shaders/**/*.frag', { eager: true })
 
 let filter
 const getFilename = (path) => {
@@ -21,7 +35,6 @@ const getFilename = (path) => {
 }
 
 async function init() {
-  
   window.ui = new Application();
   await window.ui.init({
     // background: '#',
@@ -30,102 +43,118 @@ async function init() {
     resolution: 1
   });
   window.ui.ticker.maxFPS = 30
-
-  window.app = new Application();
-  await window.app.init({
-    id: 'app',
-    background: '#000',
-    backgroundAlpha: 0,
-    resizeTo: window,
-    resolution: 1
-  });
-
-  window.app.canvas.setAttribute('id', 'canvas_app')
   window.ui.canvas.setAttribute('id', 'canvas_ui')
-
-  document.body.appendChild(window.app.canvas);
   document.body.appendChild(window.ui.canvas);
 
 
-  // Rectangle
+  await nextTick()
 
-  filter = new FilterHelper({
-    fragment: `#version 300 es
-    precision highp float;
-    uniform float u_time;// 0-1
-    out vec4 fragColor;
-    void main(){
-      fragColor = vec4(0.0, 0.0, pow(sin(u_time * 0.41) * 0.5 + 0.5, .4), 1.0);
-    }`,
-    vertex: vertex,
-    uniforms: {},
-  })
-  window.app.stage.filters = [filter.getFilter()];
+  if(location.hash) {
+    const path = location.hash.split('#')[1] || null
+    const filename = location.hash.split('#/shader/')[1] || null
+    state.path = path
+    state.filename = filename
+    const found = Object.keys(shaders.value).find(key => {
+      return key.slice(key.lastIndexOf('/')+1) === filename
+    })
+    state.shader = shaders.value[found].default
+  }
 
-  // window.addEventListener('mousemove', e => {
-  //   // filter.getFilter().resources.timeUniforms.uniforms.u_time = e.clientX / window.innerWidth
-  // })
-  window.app.ticker.maxFPS = 60
-  window.app.ticker.add(ticker => {
-    // if (filter.getFilter().groups[0].getResource(1)) {
-    //   filter.getFilter().resources.localUniforms.uniforms.uEffectWidth = filter.getFilter().groups[0].getResource(1).width;
-    // }
-    filter.getFilter().resources.timeUniforms.uniforms.u_time += 0.01 * ticker.deltaTime;
-  });
   isPixiActive.value = true
+
 }
 
-onMounted(() => {
-  Object.keys(modules.value).forEach(d => {
-    console.log(d)
-  })
-
-  init()
+const permalink = computed(() => {
+  return location.href
 
 })
+watch(() => state.shader, (val) => {
+  anime({
+    targets: transition,
+    saturation: state.shader ? 0 : 1,
+    easing: 'easeOutExpo',
+    duration: 800 ,
+  })
+});
+onMounted(() => {
+  init()
+})
 onBeforeUnmount(() => {
-  console.log('onBeforeUnmount')
-  if(window.app) {
-    window.app.destroy({
-      removeView: true
-    })
-  }
-  if(window.ui) {
+  if (window.ui) {
     window.ui.destroy({
       removeView: true
     })
   }
 })
-onUnmounted(() => {
-  console.log('onUnmount')
-})
-const shaderTitle = ref('WEBGL.NANONUM.COM')
-const onClick = (shader, title) => {
-  filter.setFragment(shader)
-  shaderTitle.value = title
+
+const onclick = (currentStage, currentShader, currentShaderTitle) => {
+  if(state.selected && state.title === currentShaderTitle) {
+    state.selected = null
+  } else {
+    Object.assign(state, {
+      selected: currentShaderTitle,
+      shader: currentShader,
+      path: location.hash = `/${currentStage}/${currentShaderTitle}`,
+      title: currentShaderTitle,
+      stage: currentStage,
+    })
+  }
+}
+const hover = (currentStage, currentShader, currentShaderTitle) => {
+  if(state.selected) return
+  Object.assign(state, {
+    shader: currentShader,
+    path: `/${currentStage}/${currentShaderTitle}`,
+    title: currentShaderTitle,
+    stage: currentStage,
+  })
 }
 </script>
 <template>
-
   <div class="c-site-title"><a href="mailto:nanonum@gmail.com">nanonum@gmail.com</a></div>
 
-  <p class="c-shader-title">{{ shaderTitle }}</p>
+  <p class="c-shader-title">{{ state.title || 'WEBGL.NANONUM.COM' }}</p>
 
-  <div style="height: 20vh;"></div>
   <h2>SHADERS</h2>
+
+  <nav v-if="state.selected" @click="state.selected = false" class="c-close"></nav>
+
   <ul class="p-gallery" v-if="isPixiActive">
-    <template v-for="(module, key) in modules">
-      <li class="p-gallery__item" @mouseenter="onClick(module.default, getFilename(key))" v-if="getFilename(key).indexOf('_') !== 0">
+    <template v-for="(shader, key) in shaders">
+      <li class="p-gallery__item" v-if="getFilename(key).indexOf('_') !== 0"
+        @click="onclick('shader', shader.default, getFilename(key))"
+        @mouseenter.passive.capture="hover('shader', shader.default, getFilename(key))"
+        :class="{ 'active': state.path === `/shader/${getFilename(key)}` }">
         <div class="item__container">
-          <Image :shader="module.default" :width="110" :height="110" :alt="getFilename(key)" />
+          <Thumbnail :shader="shader.default"
+            :saturation="transition.saturation"
+            :width="110"
+            :height="110"
+            :alt="getFilename(key)"
+            :selected="state.selected"
+            :active="state.title === getFilename(key)"
+          />
         </div>
       </li>
     </template>
   </ul>
 
-  <div style="height: 20vh;"></div>
+  <template v-if="false">
+    <h2>FILTERS</h2>
+    <ul class="p-gallery" v-if="isPixiActive">
+      <li class="p-gallery__item" @mouseenter.passive.capture="hover('filter', null, null)">
+        <div class="item__container">
+          Filter1
+        </div>
+      </li>
+    </ul>
+  </template>
+
+  <Shader v-if="isPixiActive && state.stage === 'shader'" :shader="state.shader" />
+
+
+  <input v-if="isPixiActive && state.selected" type="text" :value="permalink" class="permalink" readonly>
 
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

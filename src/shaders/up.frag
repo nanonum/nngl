@@ -327,4 +327,12 @@ void main(void) {
   // fragColor.rgb = vec3( colors.g);
   // fragColor.rgb = vec3(  smoothstep(0.70, 1.0, dFdx(balls) * 120.0));
   fragColor.a = 1.0; 
+//   fragColor.rgb = mod(u_time, 4.0) < 2.0 ? fract(pow(fragColor.rgb, vec3(1.0))) : fragColor.rgb;
+
+
+
+  fragColor.rgb = min(fragColor.rgb, vec3(1.0));
+//   fragColor.r = pow(fragColor.r, 1.80); 
+//   fragColor.g = pow(fragColor.g, 1.80); 
+//   fragColor.b = pow(fragColor.b, 1.80); 
 }

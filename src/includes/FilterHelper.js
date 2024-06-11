@@ -1,12 +1,13 @@
 import { Point, Filter, GlProgram, Graphics } from 'pixi.js';
 import ResizeHelper from './ResizeHelper.js'
 
-const pixelRatio = 1
+const pixelRatio =  window.devicePixelRatio
 
 class FilterHelper {
   constructor(setting) {
 
 
+    this.stage = setting.stage
     this.size = new Point(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio)
     this.padding = new Point()
     this.vertex = setting.vertex
@@ -43,8 +44,8 @@ class FilterHelper {
   fill() {
     this.background = new Graphics()
     this.background.rect(0, 0, window.innerWidth, window.innerHeight)  //todo resize
-    this.background.fill(0x000000)
-    app.stage.addChild(this.background)
+    this.background.fill({ color: 0x000000 })
+    this.stage.addChild(this.background)
   }
   bind() {
     new ResizeHelper(e => {
@@ -56,7 +57,7 @@ class FilterHelper {
       fragment: new_fragment,
       vertex: this.vertex,
     })
-    this.filter.glProgram.destroy()
+    // this.filter.glProgram.destroy()
     this.filter.glProgram = program
   }
   resize() {
@@ -71,6 +72,10 @@ class FilterHelper {
   }
   getFilter() {
     return this.filter
+  }
+  destroy() {
+    // this.filter.glProgram.destroy()
+    this.filter.destroy()
   }
 }
 

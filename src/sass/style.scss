@@ -41,11 +41,16 @@ body {
   margin: 0 auto;
   text-align: center;
   position: relative;
-  z-index: 5;
+  z-index: 2;
+  min-height: 100vh;
+
   display: flex;
-  align-items: center;
   flex-direction: column;
+  justify-content: center;
   align-items: flex-start;
+
+  padding-top: 120px;
+  padding-bottom: 120px;
 
   @include fn.pc {
     width: 646px;
@@ -53,6 +58,75 @@ body {
   // padding: 180px
   @include fn.sp {
     width: 100vw;
+  }
+}
+
+
+$frame_size: 10px;
+$frame_position: 30px;
+.frame {
+  z-index: 200;
+  &::before,
+  &::after {
+    content: '';
+    background: #fff;
+    position: fixed;
+  }
+  &--tl {
+    &::before {
+      width: 1px;
+      height: $frame_size;
+      top: $frame_position;
+      left: $frame_position;
+    }
+    &::after {
+      height: 1px;
+      width: $frame_size;
+      top: $frame_position;
+      left: $frame_position;
+    }
+  }
+  &--tr {
+    &::before {
+      width: 1px;
+      height: $frame_size;
+      top: $frame_position;
+      right: $frame_position;
+    }
+    &::after {
+      height: 1px;
+      width: $frame_size;
+      top: $frame_position;
+      right: $frame_position;
+    }
+  }
+  &--bl {
+    &::before {
+      width: 1px;
+      height: $frame_size;
+      bottom: $frame_position;
+      left: $frame_position;
+    }
+    &::after {
+      height: 1px;
+      width: $frame_size;
+      bottom: $frame_position;
+      left: $frame_position;
+    }
+  }
+  &--br {
+    &::before {
+      width: 1px;
+      height: $frame_size;
+      bottom: $frame_position;
+      right: $frame_position;
+    }
+    &::after {
+      height: 1px;
+      width: $frame_size;
+      bottom: $frame_position;
+      right: $frame_position;
+    }
   }
 }
 
@@ -71,7 +145,7 @@ canvas {
   z-index: 1;
 }
 #canvas_ui {
-  z-index: 2;
+  z-index: 5;
 }
 
 li {
@@ -85,8 +159,7 @@ li {
   font-size: 16px;
   line-height: 1;
   margin: 0;
-  bottom: 30px;
-  right: 30px;
+  right: 40px;
 
   // top: 50%;
   // left: 50%;
@@ -94,6 +167,9 @@ li {
   z-index: 9999;
   // letter-spacing: 4px;
   text-transform: uppercase;
+  writing-mode: vertical-lr;
+  top: 50%;
+  transform: translateY(-50%);
 }
 .c-shader-title {
 
@@ -129,6 +205,12 @@ h2 {
   display: inline-block;
   // color: #000;
 
+  margin-top: 80px;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+
   @include fn.sp {
     margin-left: fn.vw(24);
     font-size: fn.vw(16);
@@ -142,10 +224,12 @@ h2 {
   margin: 0;
   list-style-type: none;
   padding: 0;
+  z-index: 10;
 
   @include fn.pc {
     width: 646px;
     gap: 24px;
+
     grid-template-columns: repeat(5, 1fr);
     &__item {
       // display: flex;
@@ -196,6 +280,31 @@ h2 {
         display: block;
     
       }
+
+      &.active {
+        backdrop-filter: blur(0);
+        background: transparent;
+        &::after {
+          opacity: 0;
+        }
+
+      }
+      &::after {
+        transition: opacity .4s fn.$ease-in-expo;
+        opacity: 0;
+        transition: opacity .4s fn.$ease-out-expo;
+        content: '';
+        position: absolute;
+        inset: -3px;
+        background: rgba(#fff, .98);
+        border-radius: 50%;
+      }
+      &:hover {
+        
+        &::after {
+          opacity: 1;
+        }
+      }
     }
   }
   @include fn.sp {
@@ -210,4 +319,67 @@ h2 {
     }
     
   }
+}
+
+.c-close {
+  position: fixed;
+  top: 90px;
+  left: 50%;
+  margin-left: -40px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(#fff, .7);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color .4s fn.$ease-out-expo;
+  &::before,
+  &::after {
+    transition: background-color .4s fn.$ease-out-expo;
+    content: '';
+    display: block;
+    position: absolute;
+    background: #000;
+    // mix-blend-mode: difference;
+    width: 20px;
+    height: 1px;
+  }
+  &::before {
+    transform: rotate(45deg);
+  }
+  &::after {
+    transform: rotate(-45deg);
+  }
+  &:hover {
+    background-color: rgba(#000, .7);
+    &::before,
+    &::after {
+      background-color: #fff;
+    }
+  }
+}
+.permalink {
+  position: fixed;
+  z-index: 1000;
+  bottom: 40px;
+  font-size: 14px;
+  background: rgba(#fff, .5);
+  backdrop-filter: blur(8px);
+  color: #000;
+  border: none;
+  appearance: none;
+  padding: 10px;
+  width: 480px;
+  text-align: center;
+  border: 0;
+  border-radius: 4px;
+  left: 50%;
+  margin-left: -240px;
+  font-family: 'DIN Alternate', sans-serif;
+
+
 }

@@ -50,7 +50,7 @@ void main(void)
           mix(
             color0 * circle,
             color1 * circle_g,
-            fbm(st * 1.01, rad  + sin(u_time_sp * 1.2) * .125, 1.0)
+            fbm(st * .0, rad  + sin(u_time_sp * 3.2) * .1, 1.0)
           )
         , 1.0);
 

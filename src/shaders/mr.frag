@@ -127,14 +127,6 @@ vec3 grad(vec2 st){
   return mix(col3[2],col,st.t);
 }
 
-float wave(vec2 pos,float scale,float size,float phase){
-  return pos.y+(sin(pos.x*scale+phase)*size);
-}
-vec2 rot(vec2 st,float t){
-  mat2 rotate=mat2(cos(.5+t),sin(.5+t),-sin(.5+t),cos(.5+t));
-  return st*rotate;
-}
-
 float sigmoid(float val){
   return 1./(1.+pow(E,-val));
 }
@@ -156,8 +148,6 @@ vec2 move(vec2 st,float val,float r){
 
 // ------------------------------------------------------------------------------------
 
-float NUM_POLYGONS=4.;
-
 void main(){
   fragColor.a=1.;
   float texture_repeats=u_resolution.x/512.;
@@ -168,34 +158,41 @@ void main(){
   float w=gl_FragCoord.x/u_resolution.x;
   float h=gl_FragCoord.y/u_resolution.y*aspect+offset;
   vec2 pos=vec2(w,h);
-  float size=sin(u_time*2.2)*.5+1.293;
   
-  vec2 st=(1.+size)*pos.xy-vec2(.5+(size*.5));
+  // balls = smin(pn, balls, 2.2);
+  
+  // vec2 pos = gl_FragCoord.xy / u_resolution.xy;
+  vec4 noise=(texture(u_texture_noise,fract(vec2(pos.x*.5,pos.y-u_time*.012)*texture_repeats))+texture(u_texture_noise,fract(pos*texture_repeats)));
+  float size=sin(u_time*.2)*.2+1.293;
+  
+  vec2 st=(.5+size)*pos.xy-vec2(.5+(size*.5));
+  // vec2 st = 2.4 * pos.xy - vec2(1.2);
   float len=length(st.xy);
   float invl=1.-len;
   
   // balls
   float balls=0.;
   float balls2=0.;
-  float blur=pow(pnoise31(vec3(.75*st,u_time*1.1))*2.15*(invl+1.3)-.41,.40);
+  float blur=pow(pnoise31(vec3(.75*st,u_time*.1))*2.15*(invl+1.3)-.41,.40);
   for(int i=0;i<5;++i){
-    float fi=float(i)+3.20;
+    float fi=float(i)+.20;
     vec2 centeredST=pos*2.-1.;
     float ball=smoothstep(
       .0+blur*.5,
       .0,
-      pnoise21(vec2(pos.x*5.5,pos.y*5.5-(u_time*fi*1.41)-fi*.10))*
-      pnoise21(vec2(pos.x*.15,pos.y*.15-(u_time*fi*.1)-fi*.30))*1.40
-    ) * (fi * 0.3) - length(st) * .1;
+      pnoise21(vec2(pos.x*5.5,pos.y*5.5-(u_time*fi*.1)-fi*3.10))*
+      pnoise21(vec2(pos.x*.15,pos.y*.15-(u_time*fi*.1)-fi*3.30))*.80
+    ) - length(st) * .1;
     balls+=ball+smin(ball*2.4,balls,.12);
   }
     
   vec3 colors=(grad(pos*2.+sin(u_time*.2)*.40));
   fragColor=vec4(
-    colors+(2.-balls)+smoothstep(0.,.31*balls,pow(sigmoid(balls2),82.21))*.15,
+    colors+(2.-balls)+(noise.x*.16)+smoothstep(0.,.31*balls,pow(sigmoid(balls2),82.21))*.15,
     1.0// alpha
   );
-  
+
+  fragColor.rgb = mod(fragColor.rgb, .1) * 10.0;
   
   fragColor.rgb=min(fragColor.rgb,vec3(1.));
 }
