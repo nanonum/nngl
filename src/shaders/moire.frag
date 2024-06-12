@@ -3,8 +3,6 @@ precision highp float;
 out vec4 fragColor;
 uniform float u_time;
 uniform vec2 u_resolution;
-uniform sampler2D u_texture_noise;// ../swcp/texture.png
-uniform vec2 u_texture_noiseResolution;
 const float PI=3.1415926;
 const float E=2.71828182846;
 
@@ -127,53 +125,20 @@ vec3 grad(vec2 st){
   return mix(col3[2],col,st.t);
 }
 
-float sigmoid(float val){
-  return 1./(1.+pow(E,-val));
-}
-float saturate(float v){
-  return sigmoid(v)*4.-2.;
-}
-vec2 skew(vec2 st,float deg){
-  st.x=st.x+st.y*tan(deg*PI);
-  return st;
-}
-// vec2 rot(vec2 st, float deg) {
-  //   return vec2(st.x * cos(deg) - st.y * sin(deg), st.x * sin(deg) + st.y * cos(deg));
-// }
-vec2 move(vec2 st,float val,float r){
-  st.x+=sin(val)*r;
-  st.y+=cos(val)*r;
-  return st;
-}
-
 // ------------------------------------------------------------------------------------
 
 void main(){
-  fragColor.a=1.;
-  float texture_repeats=u_resolution.x/512.;
-  
-  // pos aspected
   float aspect=u_resolution.y/u_resolution.x;
-  float offset=(((u_resolution.x-u_resolution.y)/u_resolution.x)*.5);
   float w=gl_FragCoord.x/u_resolution.x;
-  float h=gl_FragCoord.y/u_resolution.y*aspect+offset;
+  float h=gl_FragCoord.y/u_resolution.y*aspect;
   vec2 pos=vec2(w,h);
-  
-  // balls = smin(pn, balls, 2.2);
-  
-  // vec2 pos = gl_FragCoord.xy / u_resolution.xy;
-  vec4 noise=(texture(u_texture_noise,fract(vec2(pos.x*.5,pos.y-u_time*.012)*texture_repeats))+texture(u_texture_noise,fract(pos*texture_repeats)));
   float size=sin(u_time*.2)*.2+1.293;
-  
   vec2 st=(.5+size)*pos.xy-vec2(.5+(size*.5));
-  // vec2 st = 2.4 * pos.xy - vec2(1.2);
   float len=length(st.xy);
-  float invl=1.-len;
   
   // balls
   float balls=0.;
-  float balls2=0.;
-  float blur=pow(pnoise31(vec3(.75*st,u_time*.1))*2.15*(invl+1.3)-.41,.40);
+  float blur=pow(pnoise31(vec3(.75*st,u_time*.1))*3.0,.40);
   for(int i=0;i<5;++i){
     float fi=float(i)+.20;
     vec2 centeredST=pos*2.-1.;
@@ -181,14 +146,14 @@ void main(){
       .0+blur*.5,
       .0,
       pnoise21(vec2(pos.x*5.5,pos.y*5.5-(u_time*fi*.1)-fi*3.10))*
-      pnoise21(vec2(pos.x*.15,pos.y*.15-(u_time*fi*.1)-fi*3.30))*.80
+      pnoise21(vec2(pos.x*.15,pos.y*.15-(u_time*fi*.1)-fi*3.30))
     ) - length(st) * .1;
     balls+=ball+smin(ball*2.4,balls,.12);
   }
     
   vec3 colors=(grad(pos*2.+sin(u_time*.2)*.40));
   fragColor=vec4(
-    colors+(2.-balls)+(noise.x*.16)+smoothstep(0.,.31*balls,pow(sigmoid(balls2),82.21))*.15,
+    colors+(2.-balls),
     1.0// alpha
   );
 

@@ -1,6 +1,7 @@
 @use "sass:math";
 @use 'functions.scss' as fn;
 @import "reset";
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto:wght@100;300;400;500;700&display=swap');
 
 body {
   overscroll-behavior: none;
@@ -33,7 +34,7 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  font-family: 'DIN Alternate', sans-serif;
+
 }
 
 #app {
@@ -62,73 +63,73 @@ body {
 }
 
 
-$frame_size: 10px;
-$frame_position: 30px;
-.frame {
-  z-index: 200;
-  &::before,
-  &::after {
-    content: '';
-    background: #fff;
-    position: fixed;
-  }
-  &--tl {
-    &::before {
-      width: 1px;
-      height: $frame_size;
-      top: $frame_position;
-      left: $frame_position;
-    }
-    &::after {
-      height: 1px;
-      width: $frame_size;
-      top: $frame_position;
-      left: $frame_position;
-    }
-  }
-  &--tr {
-    &::before {
-      width: 1px;
-      height: $frame_size;
-      top: $frame_position;
-      right: $frame_position;
-    }
-    &::after {
-      height: 1px;
-      width: $frame_size;
-      top: $frame_position;
-      right: $frame_position;
-    }
-  }
-  &--bl {
-    &::before {
-      width: 1px;
-      height: $frame_size;
-      bottom: $frame_position;
-      left: $frame_position;
-    }
-    &::after {
-      height: 1px;
-      width: $frame_size;
-      bottom: $frame_position;
-      left: $frame_position;
-    }
-  }
-  &--br {
-    &::before {
-      width: 1px;
-      height: $frame_size;
-      bottom: $frame_position;
-      right: $frame_position;
-    }
-    &::after {
-      height: 1px;
-      width: $frame_size;
-      bottom: $frame_position;
-      right: $frame_position;
-    }
-  }
-}
+// $frame_size: 10px;
+// $frame_position: 30px;
+// .frame {
+//   z-index: 200;
+//   &::before,
+//   &::after {
+//     content: '';
+//     background: #fff;
+//     position: fixed;
+//   }
+//   &--tl {
+//     &::before {
+//       width: 1px;
+//       height: $frame_size;
+//       top: $frame_position;
+//       left: $frame_position;
+//     }
+//     &::after {
+//       height: 1px;
+//       width: $frame_size;
+//       top: $frame_position;
+//       left: $frame_position;
+//     }
+//   }
+//   &--tr {
+//     &::before {
+//       width: 1px;
+//       height: $frame_size;
+//       top: $frame_position;
+//       right: $frame_position;
+//     }
+//     &::after {
+//       height: 1px;
+//       width: $frame_size;
+//       top: $frame_position;
+//       right: $frame_position;
+//     }
+//   }
+//   &--bl {
+//     &::before {
+//       width: 1px;
+//       height: $frame_size;
+//       bottom: $frame_position;
+//       left: $frame_position;
+//     }
+//     &::after {
+//       height: 1px;
+//       width: $frame_size;
+//       bottom: $frame_position;
+//       left: $frame_position;
+//     }
+//   }
+//   &--br {
+//     &::before {
+//       width: 1px;
+//       height: $frame_size;
+//       bottom: $frame_position;
+//       right: $frame_position;
+//     }
+//     &::after {
+//       height: 1px;
+//       width: $frame_size;
+//       bottom: $frame_position;
+//       right: $frame_position;
+//     }
+//   }
+// }
 
 
 canvas {
@@ -147,10 +148,8 @@ canvas {
 #canvas_ui {
   z-index: 5;
 }
-
-li {
-  text-align: left;
-  /* width: calc((100vw - 60px)/ 3); */
+::selection {
+  background-color: #333;
 }
 
 
@@ -161,6 +160,9 @@ li {
   margin: 0;
   right: 40px;
 
+
+  letter-spacing: 0.02em;
+  background: #000;
   // top: 50%;
   // left: 50%;
   // transform: translate(-50%, -50%);
@@ -176,28 +178,30 @@ li {
   @include fn.pc {
     font-style: normal;
     font-family: 'Roboto', sans-serif;
-    font-size: 150.643px;
     position: fixed;
     line-height: 1;
     color: #FFFFFF;
     margin: 0;
     
-    text-shadow: 0px 0px 40px rgba(0, 0, 0, 0.8);
+    // text-shadow: 0px 0px 40px rgba(0, 0, 0, 0.8);
+    background: #000;
 
     font-size: 16px;
+    letter-spacing: 0.02em;
     top: 40px;
     text-align: center;
-    width: 100%;
     text-transform: uppercase;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
 
-    filter: drop-shadow(0px 0px 20px black);
+    // filter: drop-shadow(0px 0px 20px black);
     
-}
+  }
 }
 h2 {
   text-align: left;
-  font-size: 18px;
+  font-size: 16px;
+  letter-spacing: 0.02em;
   margin-bottom: 40px;
   margin-left: 10px;
   // mix-blend-mode: difference;
@@ -324,8 +328,9 @@ h2 {
 .c-close {
   position: fixed;
   top: 90px;
-  left: 50%;
-  margin-left: -40px;
+  // left: 50%;
+  // margin-left: -40px;
+  right: 80px;
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -365,21 +370,102 @@ h2 {
 .permalink {
   position: fixed;
   z-index: 1000;
-  bottom: 40px;
-  font-size: 14px;
-  background: rgba(#fff, .5);
+  bottom: 30px;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  background: rgba(#000, 1);
   backdrop-filter: blur(8px);
-  color: #000;
+  color: #fff;
   border: none;
   appearance: none;
-  padding: 10px;
-  width: 480px;
+  padding: 4px;
+  width: calc(100vw - 60px);
   text-align: center;
   border: 0;
-  border-radius: 4px;
-  left: 50%;
-  margin-left: -240px;
-  font-family: 'DIN Alternate', sans-serif;
+  left: 30px;
+  font-family: 'Roboto Condensed', sans-serif;
 
+  outline: 0;
 
+}
+.closeButton-enter {
+  opacity: 0;
+  
+}
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.closeButton-enter-active,
+.closeButton-leave-active {
+  transition: opacity 0.5s ease, transform .3s fn.$ease-out-expo, background-color .4s ease;
+}
+
+.closeButton-enter-from,
+.closeButton-leave-to {
+  opacity: 0;
+  transform: scale(0);
+  background: #000;
+}
+.permalink-enter-active,
+.permalink-leave-active {
+  transition: opacity 0.3s fn.$ease-out-expo, transform .3s fn.$ease-out-expo, background-color .4s ease;
+}
+
+.permalink-enter-from,
+.permalink-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+  background: #000;
+}
+.backButton-enter-active {
+  transition: opacity 0.3s fn.$ease-out-expo, transform .3s fn.$ease-out-expo, background-color .4s ease;
+  transition-delay: .4s;
+}
+.backButton-leave-active {
+  transition: opacity 0.3s fn.$ease-out-expo, transform .3s fn.$ease-out-expo, background-color .4s ease;
+}
+
+.backButton-enter-from,
+.backButton-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.c-back {
+  position: fixed;
+  left: 40px;
+  top: 50%;
+  width: 80px;
+  height: 80px;
+  margin-top: -20px;
+  display: block;
+  display: block;
+  cursor: pointer;
+  &::after {
+    content: '';
+    width: 80px;
+    height: 2px;
+    background: #fff;
+    position: absolute;
+    top: 50%;
+    margin-top: -1px;
+    left: 0;
+  }
+  &::before {
+    content: '';
+    width: 8px;
+    height: 2px;
+    transform: rotate(-45deg);
+    background: #fff;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    margin-top: -4px;
+  }
 }

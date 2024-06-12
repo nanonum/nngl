@@ -16,7 +16,9 @@ const transition = reactive({
   saturation: 1
 })
 const shaderTitle = ref('')
+const input_permalink = ref()
 const state = reactive({
+  selected: false,
   stage: 'shader',
   shader: null,
   title: null,
@@ -42,7 +44,7 @@ async function init() {
     resizeTo: window,
     resolution: 1
   });
-  window.ui.ticker.maxFPS = 30
+  window.ui.ticker.maxFPS = 20
   window.ui.canvas.setAttribute('id', 'canvas_ui')
   document.body.appendChild(window.ui.canvas);
 
@@ -87,18 +89,28 @@ onBeforeUnmount(() => {
   }
 })
 
+function selectPermalink() {
+  input_permalink.value.select()
+}
+
 const onclick = (currentStage, currentShader, currentShaderTitle) => {
   if(state.selected && state.title === currentShaderTitle) {
     state.selected = null
   } else {
     Object.assign(state, {
-      selected: currentShaderTitle,
+      selected: !!currentShaderTitle,
       shader: currentShader,
       path: location.hash = `/${currentStage}/${currentShaderTitle}`,
       title: currentShaderTitle,
       stage: currentStage,
     })
   }
+}
+const close = () => {
+  // location.hash = ''
+  history.pushState('','','/');
+  state.selected = false
+
 }
 const hover = (currentStage, currentShader, currentShaderTitle) => {
   if(state.selected) return
@@ -117,7 +129,6 @@ const hover = (currentStage, currentShader, currentShaderTitle) => {
 
   <h2>SHADERS</h2>
 
-  <nav v-if="state.selected" @click="state.selected = false" class="c-close"></nav>
 
   <ul class="p-gallery" v-if="isPixiActive">
     <template v-for="(shader, key) in shaders">
@@ -152,8 +163,12 @@ const hover = (currentStage, currentShader, currentShaderTitle) => {
 
   <Shader v-if="isPixiActive && state.stage === 'shader'" :shader="state.shader" />
 
-
-  <input v-if="isPixiActive && state.selected" type="text" :value="permalink" class="permalink" readonly>
+  <transition name="closeButton">
+    <nav v-if="state.selected" @click="close()" class="c-close"></nav>
+  </transition>
+  <transition name="permalink">
+    <input v-if="isPixiActive && state.selected" type="text" :value="permalink" class="permalink" readonly @click="selectPermalink()" ref="input_permalink">
+  </transition>
 
 </template>
 

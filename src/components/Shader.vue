@@ -1,5 +1,5 @@
 <script setup>
-import { watch, defineProps, onMounted, reactive, ref, onBeforeUnmount, onUnmounted } from 'vue';
+import { watch, onMounted, reactive, ref, onBeforeUnmount, onUnmounted } from 'vue';
 import { Application, Sprite, Point, DisplacementFilter, Filter, GlProgram, Graphics } from 'pixi.js';
 import FilterHelper from '../includes/FilterHelper.js'
 // import Image from '../components/Image.vue';

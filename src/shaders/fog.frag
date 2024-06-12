@@ -63,4 +63,7 @@ vec4 c1 = vec4(color1 + (snoise(vec2(rad * 2.2, rad2 * .4)) + 1.0) * 0.5, alpha)
 
 fragColor = (c1 * (fbm(st + 2.0 *q + u_time * 0.01) + 1.0) * 0.5) + (c0 * fbm(st * q + u_time * 0.03));
 
+  fragColor.rgb = min(fragColor.rgb, vec3(1.0));
+fragColor.a = 1.0;
+
 }
