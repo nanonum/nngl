@@ -92,7 +92,7 @@ const replaceUniform = (shader) => {
 
 onMounted(async () => {
 
-  const texture = await Assets.load('/vite.svg');
+  const texture = await Assets.load('./vite.svg');
 
   updateBound(bound, getBound(el.value.getBoundingClientRect()))
 
