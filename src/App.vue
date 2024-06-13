@@ -6,11 +6,15 @@ import Shader from './components/Shader.vue';
 import Thumbnail from './components/Thumbnail.vue';
 import vertex from './default.vert';
 import anime from 'animejs/lib/anime.es.js'
-
+import { useMediaQuery } from '@vueuse/core'
+const isSP = useMediaQuery('(max-width: 860px)')
 
 // Vue
 const isPixiActive = ref(false)
 const stage = ref('shader')
+const isFullscreen = ref(false)
+
+const thumbnail_size = isSP ? 85 / 375* window.innerWidth : 110
 
 const transition = reactive({
   saturation: 1
@@ -70,14 +74,6 @@ const permalink = computed(() => {
   return location.href
 
 })
-watch(() => state.shader, (val) => {
-  anime({
-    targets: transition,
-    saturation: state.shader ? 0 : 1,
-    easing: 'easeOutExpo',
-    duration: 800 ,
-  })
-});
 onMounted(() => {
   init()
 })
@@ -107,13 +103,22 @@ const onclick = (currentStage, currentShader, currentShaderTitle) => {
   }
 }
 const close = () => {
-  // location.hash = ''
-  history.pushState('','','/');
+
+  history.pushState('','','/nngl/');
   state.selected = false
 
 }
+const toggleFullscreen = () => {
+  isFullscreen.value = !isFullscreen.value
+  // console.log(isFullscreen.value)
+  document.body.classList.toggle('--fullscreen')
+}
 const hover = (currentStage, currentShader, currentShaderTitle) => {
+
+  console.log(isPixiActive.value)
+
   if(state.selected) return
+
   Object.assign(state, {
     shader: currentShader,
     path: `/${currentStage}/${currentShaderTitle}`,
@@ -121,13 +126,20 @@ const hover = (currentStage, currentShader, currentShaderTitle) => {
     stage: currentStage,
   })
 }
+watch(() => state.shader, (val) => {
+  anime({
+    targets: transition,
+    saturation: state.shader ? 0 : 1,
+    easing: 'easeOutExpo',
+    duration: 800 ,
+  })
+});
+
 </script>
 <template>
-  <div class="c-site-title"><a href="mailto:nanonum@gmail.com">nanonum@gmail.com</a></div>
+  <h1 class="c-shader-title">{{ state.title || 'NN.GL' }}</h1>
 
-  <p class="c-shader-title">{{ state.title || 'WEBGL.NANONUM.COM' }}</p>
-
-  <h2>SHADERS</h2>
+  <h2 class="c-subtitle">SHADERS</h2>
 
 
   <ul class="p-gallery" v-if="isPixiActive">
@@ -139,11 +151,12 @@ const hover = (currentStage, currentShader, currentShaderTitle) => {
         <div class="item__container">
           <Thumbnail :shader="shader.default"
             :saturation="transition.saturation"
-            :width="110"
-            :height="110"
+            :width="thumbnail_size"
+            :height="thumbnail_size"
             :alt="getFilename(key)"
             :selected="state.selected"
             :active="state.title === getFilename(key)"
+            :show="!isFullscreen"
           />
         </div>
       </li>
@@ -166,9 +179,17 @@ const hover = (currentStage, currentShader, currentShaderTitle) => {
   <transition name="closeButton">
     <nav v-if="state.selected" @click="close()" class="c-close"></nav>
   </transition>
+  <transition name="fullscreenButton">
+    <nav @click="toggleFullscreen()" class="c-fullscreen"></nav>
+  </transition>
   <transition name="permalink">
     <input v-if="isPixiActive && state.selected" type="text" :value="permalink" class="permalink" readonly @click="selectPermalink()" ref="input_permalink">
   </transition>
+
+  <div class="c-share">
+    <a href="mailto:nanonum@gmail.com">{{ isSP ? 'CONTACT' : 'nanonum@gmail.com' }}</a>
+    <a href="https://linktr.ee/nanonum" target="_blank">{{ isSP ? 'MORE LINKS' : 'linktr.ee/nanonum' }}</a>
+  </div>
 
 </template>
 

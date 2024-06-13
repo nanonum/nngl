@@ -7,7 +7,8 @@ import {
   onUnmounted,
   onActivated,
   onMounted,
-  onUpdated
+  onUpdated,
+  watch
 } from 'vue'
 // import Intersection from '../modules/_Intersection.js'
 import {
@@ -38,6 +39,7 @@ const props = defineProps({
     type: Number,
     default: 1
   },
+  show: Boolean,
   selected: Boolean,
   active: Boolean,
   width: Number,
@@ -47,7 +49,7 @@ const props = defineProps({
 
 const el = ref()
 let background
-const viewport = new Point(110, 110)
+let circle
 const bound = {}
 let filter
 const sprite = new Sprite()
@@ -59,6 +61,8 @@ const update = (ticker) => {
     background.y = bound.y;
     sprite.x = bound.x;
     sprite.y = bound.y;
+    sprite.width = bound.width
+    sprite.height = bound.height
   }
   if (props.active === true || !props.selected ) {
     filter.resources.timeUniforms.uniforms.u_time += 0.01 * ticker.deltaTime;
@@ -75,12 +79,17 @@ const update = (ticker) => {
 const replaceUniform = (shader) => {
   const adjusted = `
     vec2 aPosition = vec2(
-      (gl_FragCoord.x - u_position.x) * u_resolution.x / 110.0  ,
-      (gl_FragCoord.y - (u_resolution.y - u_position.y ) + 110.0) * u_resolution.y / 110.0  
+      (gl_FragCoord.x - u_position.x) * u_resolution.x / u_posteffect_viewport.x  ,
+      (gl_FragCoord.y - (u_resolution.y - u_position.y ) + u_posteffect_viewport.x) * u_resolution.y / u_posteffect_viewport.x  
     );`
   let tmp = shader
   tmp = tmp.replace(/gl_FragCoord/ig, 'aPosition')
-  tmp = tmp.replace(/uniform[\s]*vec2[\s]*u_resolution;/ig, 'uniform vec2 u_resolution;uniform vec2 u_position;uniform float u_posteffect_mix;')
+  tmp = tmp.replace(/uniform[\s]*vec2[\s]*u_resolution;/ig, `
+    uniform vec2 u_resolution;
+    uniform vec2 u_position;
+    uniform vec2 u_posteffect_viewport;
+    uniform float u_posteffect_mix;
+  `)
   tmp = tmp.replace(/void main\([void]*\)[\s]*{/ig, `void main(){${adjusted}`)
 
   // desaturation
@@ -110,6 +119,9 @@ onMounted(async () => {
         u_position: {
           value: new Point(0, 0), type: 'vec2<f32>'
         },
+        u_posteffect_viewport: {
+          value: new Point(bound.width, bound.height), type: 'vec2<f32>'
+        },
         u_posteffect_mix: {
           value: 0.0, type: 'f32'
         },
@@ -128,7 +140,8 @@ onMounted(async () => {
 
 
   background = new Graphics()
-  background.circle(bound.width / 2, bound.width / 2, bound.width / 2)  //todo resize
+  circle = background.circle(bound.width / 2, bound.width / 2, bound.width / 2)  //todo resize
+
   background.fill({ color: 0x000000 })
   // background.x = bound.x;
   // background.y = bound.y;
@@ -139,8 +152,8 @@ onMounted(async () => {
   sprite.filters = [filter]
   window.ui.stage.addChild(sprite)
 
-  viewport.x = props.width || 110
-  viewport.y = props.height || 110
+  // viewport.x = props.width || 110
+  // viewport.y = props.height || 110
   window.ui.stage.addChild(background)
   filter.resources.localUniforms.uniforms.u_position.y = bound.y
   filter.resources.localUniforms.uniforms.u_position.x = bound.x
@@ -154,6 +167,16 @@ onMounted(async () => {
   window.addEventListener('resize', e => {
     filter.resources.localUniforms.uniforms.u_resolution.x = window.innerHeight
     filter.resources.localUniforms.uniforms.u_resolution.y = window.innerHeight
+    // viewport.width = 
+    // background.circle(bound.width / 2, bound.width / 2, bound.width / 2)  //todo resize
+    circle.x = bound.width / 2
+    circle.y = bound.width / 2
+    circle.width = bound.width
+    circle.height = bound.height
+    
+    sprite.width = bound.width
+    sprite.height = bound.height
+    console.log(bound.width)
   })
 
   // window.addEventListener('mousemove', e => {
@@ -192,6 +215,9 @@ onMounted(async () => {
 
 })
 
+watch(() => props.show, (val) => {
+  sprite.visible = val
+});
 onUnmounted(() => {
   if (window.ui.ticker) {
     window.ui.ticker.remove(update);

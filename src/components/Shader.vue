@@ -14,7 +14,7 @@ const props = defineProps({
   shader: String
 })
 // Vue
-const isPixiActive = ref(false)
+const isShaderActive = ref(false)
 let filter
 
 const update = (ticker) => {
@@ -54,7 +54,7 @@ async function init() {
   window.background.canvas.setAttribute('id', 'canvas_app')
   document.body.appendChild(window.background.canvas);
 
-  isPixiActive.value = true
+  isShaderActive.value = true
 }
 onMounted(() => {
   // console.log('%cMOUNT', 'color: red;')
@@ -62,7 +62,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  isPixiActive.value = false
+  isShaderActive.value = false
   if (window.background.ticker) {
     // console.log('removeticker')
     window.background.ticker.remove(update);
@@ -86,17 +86,17 @@ onUnmounted(() => {
 
 watch(() => props.shader, () => {
 
+  console.log()
   // console.log("%cWATCH", 'color: red')
-  // console.log('isPixiActive', isPixiActive.value)
-  // if(isPixiActive.value) {
-  // }
-  filter.setFragment(props.shader)
+  // console.log('isShaderActive', isShaderActive.value)
+  if(isShaderActive.value) {
+    filter.setFragment(props.shader)
+  }
 
   // hoge.value = props.hoge;
 });
 </script>
 <template>
-  <div class="c-site-title"><a href="mailto:nanonum@gmail.com">nanonum@gmail.com</a></div>
 </template>
 
 <style scoped>
