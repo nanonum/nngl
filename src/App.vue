@@ -48,7 +48,7 @@ async function init() {
     resizeTo: window,
     resolution: 1
   });
-  window.ui.ticker.maxFPS = 20
+  window.ui.ticker.maxFPS = 15
   window.ui.canvas.setAttribute('id', 'canvas_ui')
   document.body.appendChild(window.ui.canvas);
 
