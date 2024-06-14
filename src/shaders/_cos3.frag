@@ -2,6 +2,7 @@
 precision highp float;
 out vec4 fragColor;
 uniform float u_time;
+uniform vec2 u_mouse;
 uniform vec2 u_resolution;
 uniform sampler2D u_texture_1; // ../swcp/texture.png
 uniform vec2 u_texture_1Resolution;
@@ -27,8 +28,8 @@ float nco(vec2 st, float seed, float freq1, float freq2) {
   vec2 st_m = mod(st * 2.0, 1.0);
 
   return
-     cos(noise_1 * snoise(vec2(st_m.x, st_m.x)) * 8.0)
-   * cos(noise_2 * snoise(vec2(st_m.x, st_m.y)) * 5.0);
+     cos(noise_1 * snoise(vec2(st_m.x, st_m.x)) * 8.0 +  u_mouse.x / u_resolution.x)
+   * cos(noise_2 * snoise(vec2(st_m.x, st_m.y)) * 8.0 +  u_mouse.y / u_resolution.y);
 }
 
 void main(){

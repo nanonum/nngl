@@ -21,6 +21,10 @@ const update = (ticker) => {
   filter.getFilter().resources.timeUniforms.uniforms.u_time += 0.01 * ticker.deltaTime;
 }
 
+const onMouseMove = (e) => {
+  filter.getFilter().resources.localUniforms.uniforms.u_mouse = [e.clientX, e.clientY];
+}
+
 async function init() {
 
 
@@ -54,7 +58,10 @@ async function init() {
   window.background.canvas.setAttribute('id', 'canvas_app')
   document.body.appendChild(window.background.canvas);
 
+  window.addEventListener('mousemove', onMouseMove)
+
   isShaderActive.value = true
+  
 }
 onMounted(() => {
   // console.log('%cMOUNT', 'color: red;')
@@ -82,13 +89,10 @@ onUnmounted(() => {
   // console.log('onUnmount', window.background)
   filter.destroy()
   window.background = null
+  window.removeEventListener('mousemove', onMouseMove)
 })
 
 watch(() => props.shader, () => {
-
-  console.log()
-  // console.log("%cWATCH", 'color: red')
-  // console.log('isShaderActive', isShaderActive.value)
   if(isShaderActive.value) {
     filter.setFragment(props.shader)
   }

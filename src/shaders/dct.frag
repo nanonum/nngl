@@ -13,11 +13,11 @@ const float PI = 3.1415926;
 float nco(vec2 st, float seed, float freq1, float freq2) {
 
   vec2 st_f = vec2(floor(st.x * freq1), floor(st.y * freq1));
-  float noise_1 = snoise(st_f + u_time * .04 + seed + sin(u_time * .21) * 0.21);
+  float noise_1 = snoise(st_f + u_time * .04 + seed + sin(u_time * .3) * 0.3);
   
   // vec2 st_f2 = floor(st * .10);
   vec2 st_f2 = vec2(floor(st.x * freq2), floor(st.y * freq2));
-  float noise_2 = snoise(st_f2 + u_time * .04 + seed + sin(u_time * .21) * 0.21);
+  float noise_2 = snoise(st_f2 + u_time * .04 + seed + sin(u_time * .3) * 0.3);
 
 
   vec2 st_m = mod(st * 4.0, 1.0);

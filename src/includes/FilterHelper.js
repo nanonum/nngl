@@ -9,6 +9,7 @@ class FilterHelper {
 
     this.stage = setting.stage
     this.size = new Point(window.innerWidth * pixelRatio, window.innerHeight * pixelRatio)
+    this.mouse = new Point(0, 0)
     this.padding = new Point()
     this.vertex = setting.vertex
     this.init(setting.fragment, this.vertex, setting.uniforms || {})
@@ -33,6 +34,9 @@ class FilterHelper {
           u_resolution: {
             value: this.size, type: 'vec2<f32>'
           },
+          u_mouse: {
+            value: this.u_mouse, type: 'vec2<f32>'
+          },
         }, uniforms),
         timeUniforms: {
           u_time: { value: 0.0, type: 'f32' },
@@ -48,7 +52,7 @@ class FilterHelper {
     this.stage.addChild(this.background)
   }
   bind() {
-    new ResizeHelper(e => {
+    this.ResizeHelper = new ResizeHelper(e => {
       this.resize()
     })
   }
@@ -76,6 +80,7 @@ class FilterHelper {
   destroy() {
     // this.filter.glProgram.destroy()
     this.filter.destroy()
+    this.ResizeHelper.destroy()
   }
 }
 
