@@ -12,7 +12,7 @@ vec2 rot(vec2 st,float t){
   return st*rotate;
 }
 
-#include "../../../node_modules/glsl-noise/simplex/2d.glsl"
+#include "../../node_modules/glsl-noise/simplex/2d.glsl"
 
 float nco(vec2 st, float seed) {
 
@@ -26,8 +26,8 @@ float nco(vec2 st, float seed) {
   vec2 st_m = mod(st * .40, 1.0);
 
   return
-     cos(0.98 * noise_1 * snoise(vec2(st_m.x, st_m.x)) * 30.0)
-   * cos(0.98 * noise_2 * snoise(vec2(st_m.x, st_m.y)) * 30.0);
+     cos(0.98 * noise_1 * snoise(vec2(st_m.x, st_m.x)) * 390.0)
+   * cos(0.98 * noise_2 * snoise(vec2(st_m.x, st_m.y)) * 390.0);
 }
 
 void main(){
