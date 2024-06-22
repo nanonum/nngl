@@ -135,16 +135,16 @@ watch(() => state.shader, (val) => {
   })
 });
 
+const isDev = import.meta.env.DEV
+
 </script>
 <template>
   <h1 class="c-shader-title">{{ state.title || 'NN.GL' }}</h1>
 
   <h2 class="c-subtitle">SHADERS</h2>
-
-
   <ul class="p-gallery" v-if="isPixiActive">
     <template v-for="(shader, key) in shaders">
-      <li class="p-gallery__item" v-if="getFilename(key).indexOf('_') !== 0"
+      <li class="p-gallery__item" v-if="isDev || getFilename(key).indexOf('_') !== 0"
         @click="onclick('shader', shader.default, getFilename(key))"
         @mouseenter.passive.capture="hover('shader', shader.default, getFilename(key))"
         :class="{ 'active': state.path === `/shader/${getFilename(key)}` }">
