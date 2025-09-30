@@ -50,6 +50,13 @@ float draw_sin( vec2 st, float freq, float phase, float weight, float amp, float
 //   return abs(weight/r);
 // }
 
+vec2 expcirc(vec2 st) {
+  vec2 r = sqrt(1.0 - st * st);
+  return vec2(
+    isnan(r.x) ? 0.0 : r.x,
+    isnan(r.y) ? 0.0 : r.y
+  );
+}
 float getpart(float x, float n, float i) {
   float modi = mod(i, n);
   return 
@@ -63,22 +70,35 @@ float tri(float x) {
 }
 
 float getpartphasor(float x, float n, float i, float strength) {
-  float phase = fract(x * n);
+  float phase = (fract(x * n) - 0.5) * 2.0;   // -1 to 1
+  float circ = sqrt(.6 - phase * phase); // sqrt(1*x^2)
   float part = getpart(x, n, i);
   // return phase;
   // return  part;
-  return pow(1.0 - tri(phase), strength) * part;
+  // return part * phase;
+  // return part;
+  return part * circ;
+}
+
+
+vec2 centeredST() {
+  float aspect = u_resolution.y/u_resolution.x;
+  return (2.0 * gl_FragCoord.xy -u_resolution.xy)/ min(u_resolution.x, u_resolution.y) / aspect;
 }
 
 void main(void){
-  vec2 st = gl_FragCoord.xy/u_resolution.xy;
-  vec2 uv = st * 2.0 - 1.0;
+  vec2 st = centeredST();
+  vec2 uv = (gl_FragCoord.xy/u_resolution.xy) * 2.0 - 1.0;
 
+  uv *= length(uv * 1.02);
+  st *= .01 + (length(st * .2) * .01);
+
+  float weight = 1.0;
   vec3 crt = vec3(
-    getpartphasor(fract(st.y * .07 * u_resolution.x), 3.0, 0.0, .50) * getpartphasor(fract(st.x * 1.0), 1.0, 1.0, .40),
-    getpartphasor(fract(st.y * .07 * u_resolution.x), 3.0, 1.0, .50) * getpartphasor(fract(st.x * 1.0), 1.0, 1.0, .40),
-    getpartphasor(fract(st.y * .07 * u_resolution.x), 3.0, 2.0, .50) * getpartphasor(fract(st.x * 1.0), 1.0, 1.0, .40)
-  );
+    getpartphasor(fract(st.x / weight * u_resolution.x), 3.0, 0.0, .50),
+    getpartphasor(fract(st.x / weight * u_resolution.x), 3.0, 1.0, .50),
+    getpartphasor(fract(st.x / weight * u_resolution.x), 3.0, 2.0, .50) * 1.20
+  ) * length(sqrt(1.0 - uv * uv));
 
   // crt.rg = rot(crt.rg, (time));
 
