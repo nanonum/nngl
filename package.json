@@ -11,7 +11,7 @@
   "dependencies": {
     "@vueuse/core": "^10.11.0",
     "animejs": "^3.2.2",
-    "axios": "^1.12.2",
+    "axios": "^1.13.5",
     "glsl-noise": "^0.0.0",
     "pixi.js": "^8.1.6",
     "throttle-debounce": "^5.0.0",
